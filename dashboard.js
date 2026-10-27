@@ -23,7 +23,7 @@
     viewsDb: "https://globalviewcounter-default-rtdb.europe-west1.firebasedatabase.app",
     catalogApi: "https://siya-public-api.priluckijmikita.workers.dev/public/catalog",
     avatarApi: "https://api.uarpeh.xyz/api",
-    botUsername: "@siyadashbot",
+    botUsername: "ыiyadashbot",
     // Roblox OAuth: Client ID застосунку з Creator Dashboard. Адреса панелі
     // (https://dashboard.uarpeh.xyz/) має бути серед Redirect URLs.
     robloxClientId: "1724610019184754844",
