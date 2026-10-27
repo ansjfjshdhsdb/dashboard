@@ -26,7 +26,7 @@
     botUsername: "uarpehbot",
     // Roblox OAuth: Client ID застосунку з Creator Dashboard. Адреса панелі
     // (https://dashboard.uarpeh.xyz/) має бути серед Redirect URLs.
-    robloxClientId: "3526437072957618224",
+    robloxClientId: "1724610019184754844",
     robloxAuthUrl: "https://apis.roblox.com/oauth/v1/authorize",
     // Адреса повернення має точно збігатися з однією з Redirect URLs у Roblox.
     // Порожньо — береться адреса цієї сторінки з index.html у кінці,
