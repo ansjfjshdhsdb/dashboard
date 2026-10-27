@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; object-src 'none'; base-uri 'none';">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Політика конфіденційності — СіЯ Панель</title>
+<meta name="description" content="Які дані обробляє СіЯ Панель спільноти UkraineRP і як ними керувати.">
+<link rel="icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap">
+<link rel="stylesheet" href="legal.css?v=2">
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <a class="brand" href="./"><span class="brand-mark"><img class="logo-light" src="img/logo-black.png" alt="СіЯ" width="305" height="154"><img class="logo-dark" src="img/logo-white.png" alt="СіЯ" width="305" height="153"></span><span class="brand-sub">Дашбоард</span></a>
+    <nav aria-label="Документи">
+      <a href="terms.html">Умови</a>
+      <a href="privacy.html" aria-current="page">Конфіденційність</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="lang-block" lang="uk" id="uk">
+      <h1>Політика конфіденційності</h1>
+      <p class="meta">Набуває чинності 27 жовтня 2026 року. Останні зміни: 27 жовтня 2026 року.</p>
+      <p class="lang-switch"><a href="#en">English version</a></p>
+
+      <div class="summary"><p>Коротко: ми отримуємо лише те, що потрібно, щоб упізнати вас і перевірити ваші права в реєстрі. Ми не продаємо даних, не показуємо реклами й не стежимо за вами на інших сайтах.</p></div>
+
+      <h2>1. Про що ця політика</h2>
+      <p>СіЯ Панель (далі — панель) — вебзастосунок спільноти UkraineRP. Він потрібен для ведення реєстру ролей фракцій і ліцензій рольового сервера UkraineRP у Roblox, а також для перегляду статистики відвідувань сайту uarpeh.xyz. Панель підтримує спільнота UkraineRP. Вона не повʼязана з Roblox Corporation і не схвалена нею.</p>
+      <p>Ця політика пояснює, які дані обробляє панель, навіщо і як ви можете ними керувати.</p>
+
+      <h2>2. Які дані ми отримуємо</h2>
+      <table>
+        <thead><tr><th>Дані</th><th>Звідки</th><th>Навіщо</th></tr></thead>
+        <tbody>
+          <tr><td>ID користувача Roblox, нікнейм, відображуване імʼя, посилання на аватар</td><td>Roblox OAuth 2.0 з дозволами <code>openid</code> і <code>profile</code>, якщо ви входите через Roblox</td><td>Упізнати вас і знайти вашу роль у фракції за нікнеймом</td></tr>
+          <tr><td>Telegram ID, юзернейм, імʼя, посилання на фото, час входу</td><td>Telegram (кнопка входу або міні-застосунок), якщо ви входите через Telegram</td><td>Упізнати вас і знайти вашу роль за контактом Telegram</td></tr>
+          <tr><td>Дані, які ви вносите в реєстр: нікнейм гравця, роль або звання, контакт Telegram, ID і терміни ліцензій, причини скасування чи відсторонення</td><td>Ви, коли редагуєте реєстр</td><td>Ведення реєстру сервера</td></tr>
+          <tr><td>Запис про зміну: хто змінив (нікнейм Roblox або Telegram), з якою роллю і коли</td><td>Створюється автоматично під час кожної зміни</td><td>Щоб можна було перевірити, хто і коли змінив реєстр</td></tr>
+        </tbody>
+      </table>
+
+      <h2>3. Чого ми не отримуємо</h2>
+      <ul>
+        <li>Пароль від Roblox чи Telegram: вхід відбувається на їхніх сайтах.</li>
+        <li>Електронну пошту чи номер телефону.</li>
+        <li>Баланс Robux, інвентар чи дозвіл діяти від вашого імені в Roblox.</li>
+        <li>Платіжні дані.</li>
+        <li>Рекламні чи аналітичні cookie.</li>
+      </ul>
+
+      <h2>4. Як працює вхід через Roblox</h2>
+      <p>Ви підтверджуєте вхід на сайті Roblox, і Roblox передає панелі одноразовий код. Наш сервер обмінює цей код на тимчасовий токен і один раз читає ваш профіль: ID, нікнейм, імʼя та аватар. Після цього токен не використовується і ніде не зберігається. Замість нього панель отримує власний підписаний ключ сесії, який діє до 7 днів.</p>
+      <p>Доступ панелі можна будь-коли відкликати в налаштуваннях акаунта Roblox, у розділі авторизованих застосунків.</p>
+
+      <h2>5. Де зберігаються дані</h2>
+      <ul>
+        <li>У вашому браузері зберігаються ключ сесії або дані входу Telegram (до 7 днів), вибрана тема та посилання на аватари. Кнопка «Вийти» видаляє дані входу.</li>
+        <li>Реєстр ролей і ліцензій зберігається на GitHub і публікується на сайті uarpeh.xyz. Він публічний: нікнейми, ролі, ліцензії та контакти Telegram бачать усі відвідувачі сайту. Записи про зміни зберігаються в історії реєстру.</li>
+        <li>Сервер не зберігає ваших даних входу: він перевіряє їх під час кожного запиту.</li>
+      </ul>
+
+      <h2>6. Статистика відвідувань</h2>
+      <p>Панель показує, скільки разів за день переглядали сайт uarpeh.xyz. Дані беруться з лічильника сайту в Google Firebase. Це лише загальні числа: панель не бачить, хто саме відвідав сайт, і не рахує ваших переглядів самої панелі.</p>
+
+      <h2>7. Кому передаються дані</h2>
+      <ul>
+        <li><strong>Roblox Corporation</strong> — вхід через Roblox та зображення аватарів.</li>
+        <li><strong>Telegram</strong> — вхід через Telegram.</li>
+        <li><strong>Supabase</strong> — сервер, який перевіряє вхід і вносить зміни до реєстру.</li>
+        <li><strong>GitHub</strong> — зберігання реєстру та історії змін.</li>
+        <li><strong>Google</strong> — лічильник переглядів (Firebase) і шрифти сторінки (Google Fonts).</li>
+        <li><strong>Cloudflare</strong> і сервіси uarpeh.xyz — публічні аватари гравців.</li>
+      </ul>
+      <p>Ми не продаємо даних і не передаємо їх із рекламною метою.</p>
+
+      <h2>8. Ваші права</h2>
+      <ul>
+        <li>Переглянути дані про себе: вони видні в реєстрі та в профілі гравця в панелі.</li>
+        <li>Виправити або видалити запис про себе: зверніться до адміністрації.</li>
+        <li>Вийти з панелі й видалити дані входу з браузера кнопкою «Вийти».</li>
+        <li>Відкликати доступ панелі в налаштуваннях Roblox.</li>
+      </ul>
+      <p>Запити надсилайте в Telegram на <a href="https://t.me/UkraineRPSupport">@UkraineRPSupport</a>, вказавши свій нікнейм Roblox. Ми відповідаємо протягом 7 днів.</p>
+
+      <h2>9. Вік</h2>
+      <p>Якщо вам менше 13 років, не користуйтеся панеллю.</p>
+
+      <h2>10. Зміни політики</h2>
+      <p>Ми можемо оновлювати цю політику разом із панеллю. Дата останніх змін завжди вказана вгорі сторінки. Якщо ви користуєтеся панеллю після змін, це означає згоду з новою редакцією.</p>
+
+      <h2>11. Контакти</h2>
+      <p>Питання про дані та запити на видалення: <a href="https://t.me/UkraineRPSupport">@UkraineRPSupport</a>. Новини спільноти: <a href="https://t.me/UkraineRPOfficial">@UkraineRPOfficial</a>.</p>
+    </section>
+
+    <section class="lang-block" lang="en" id="en">
+      <h2>Privacy Policy</h2>
+      <p class="meta">Effective October 27, 2026. Last updated October 27, 2026.</p>
+      <p class="lang-switch"><a href="#uk">Українська версія</a></p>
+
+      <div class="summary"><p>In short: we only receive what we need to recognize you and check your permissions in the registry. We don't sell data, show ads, or track you on other websites.</p></div>
+
+      <h2>1. About this policy</h2>
+      <p>SiYa Panel (“the panel”) is a web app run by the UkraineRP community. It is used to maintain the faction roles and licenses registry of the UkraineRP Roblox roleplay server and to view visit statistics for uarpeh.xyz. The panel is operated by the UkraineRP community and is not affiliated with or endorsed by Roblox Corporation.</p>
+      <p>This policy explains what data the panel processes, why, and how you can control it.</p>
+
+      <h2>2. Data we receive</h2>
+      <table>
+        <thead><tr><th>Data</th><th>Source</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>Roblox user ID, username, display name, avatar URL</td><td>Roblox OAuth 2.0 with the <code>openid</code> and <code>profile</code> scopes, if you sign in with Roblox</td><td>To recognize you and find your faction role by username</td></tr>
+          <tr><td>Telegram ID, username, name, photo URL, sign-in time</td><td>Telegram (login button or mini app), if you sign in with Telegram</td><td>To recognize you and find your role by Telegram contact</td></tr>
+          <tr><td>Data you enter into the registry: player username, role or rank, Telegram contact, license IDs and expiry dates, reasons for revocation or suspension</td><td>You, when editing the registry</td><td>Maintaining the server registry</td></tr>
+          <tr><td>Change record: who made a change (Roblox or Telegram username), with which role, and when</td><td>Created automatically with every change</td><td>So that changes to the registry can be audited</td></tr>
+        </tbody>
+      </table>
+
+      <h2>3. Data we do not receive</h2>
+      <ul>
+        <li>Your Roblox or Telegram password: sign-in happens on their websites.</li>
+        <li>Your email address or phone number.</li>
+        <li>Your Robux balance, inventory, or permission to act on your behalf in Roblox.</li>
+        <li>Payment information.</li>
+        <li>Advertising or analytics cookies.</li>
+      </ul>
+
+      <h2>4. How Roblox sign-in works</h2>
+      <p>You confirm the sign-in on the Roblox website, and Roblox gives the panel a one-time code. Our server exchanges that code for a temporary token and reads your profile once: user ID, username, display name, and avatar. The token is not used again and is not stored anywhere. Instead, the panel receives its own signed session key, valid for up to 7 days.</p>
+      <p>You can revoke the panel's access at any time in your Roblox account settings, in the section for authorized apps.</p>
+
+      <h2>5. Where data is stored</h2>
+      <ul>
+        <li>Your browser stores the session key or Telegram sign-in data (up to 7 days), your theme choice, and avatar image links. “Sign out” deletes the sign-in data.</li>
+        <li>The roles and licenses registry is stored on GitHub and published on uarpeh.xyz. It is public: usernames, roles, licenses, and Telegram contacts are visible to every visitor of the site. Change records are kept in the registry history.</li>
+        <li>The server does not store your sign-in data; it verifies it on every request.</li>
+      </ul>
+
+      <h2>6. Visit statistics</h2>
+      <p>The panel shows how many times uarpeh.xyz was viewed each day, using the site's counter in Google Firebase. These are aggregate numbers only: the panel cannot see who visited the site and does not count your visits to the panel.</p>
+
+      <h2>7. Who receives data</h2>
+      <ul>
+        <li><strong>Roblox Corporation</strong> — Roblox sign-in and avatar images.</li>
+        <li><strong>Telegram</strong> — Telegram sign-in.</li>
+        <li><strong>Supabase</strong> — the server that verifies sign-in and applies changes to the registry.</li>
+        <li><strong>GitHub</strong> — storage of the registry and its change history.</li>
+        <li><strong>Google</strong> — the view counter (Firebase) and page fonts (Google Fonts).</li>
+        <li><strong>Cloudflare</strong> and uarpeh.xyz services — public player avatars.</li>
+      </ul>
+      <p>We do not sell data or share it for advertising.</p>
+
+      <h2>8. Your rights</h2>
+      <ul>
+        <li>See the data about you: it is visible in the registry and on your player profile in the panel.</li>
+        <li>Correct or remove your record: contact the administration.</li>
+        <li>Sign out and delete sign-in data from your browser with “Sign out”.</li>
+        <li>Revoke the panel's access in your Roblox settings.</li>
+      </ul>
+      <p>Send requests on Telegram to <a href="https://t.me/UkraineRPSupport">@UkraineRPSupport</a> with your Roblox username. We reply within 7 days.</p>
+
+      <h2>9. Age</h2>
+      <p>If you are under 13, please do not use the panel.</p>
+
+      <h2>10. Changes to this policy</h2>
+      <p>We may update this policy as the panel changes. The date of the latest update is always shown at the top of this page. Using the panel after a change means you accept the updated policy.</p>
+
+      <h2>11. Contact</h2>
+      <p>Data questions and deletion requests: <a href="https://t.me/UkraineRPSupport">@UkraineRPSupport</a>. Community news: <a href="https://t.me/UkraineRPOfficial">@UkraineRPOfficial</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <span>© 2026 спільнота UkraineRP</span>
+    <a href="terms.html">Умови користування</a>
+    <a href="./">До панелі</a>
+  </footer>
+</div>
+</body>
+</html>
