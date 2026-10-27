@@ -28,6 +28,10 @@
     // (https://dashboard.uarpeh.xyz/) має бути серед Redirect URLs.
     robloxClientId: "3526437072957618224",
     robloxAuthUrl: "https://apis.roblox.com/oauth/v1/authorize",
+    // Адреса повернення має точно збігатися з однією з Redirect URLs у Roblox.
+    // Порожньо — береться адреса цієї сторінки з index.html у кінці,
+    // напр. https://dashboard.uarpeh.xyz/index.html
+    robloxRedirectUri: "",
     siteUrl: "https://uarpeh.xyz",
     timeZone: "Europe/Kyiv",
     loginMaxAgeDays: 7,
@@ -409,7 +413,7 @@
     if (r) removeKey(KEY_RBX);
     return false;
   }
-  const rbxRedirect = () => location.origin + location.pathname.replace(/index\.html$/, "");
+  const rbxRedirect = () => CONFIG.robloxRedirectUri || (location.origin + location.pathname.replace(/\/$/, "/index.html"));
   function randomStr(bytes) {
     const a = new Uint8Array(bytes);
     crypto.getRandomValues(a);
