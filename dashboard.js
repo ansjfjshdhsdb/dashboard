@@ -1,17 +1,4 @@
-/*
- * СіЯ — панель реєстру.
- *
- * Що робить:
- *   • показує й редагує ролі (players.js) і ліцензії (licenses.js) так само, як СіЯ:
- *     ті самі запити до функції serversideroles, ті самі права;
- *   • показує статистику переглядів головного сайту з лічильника, який веде
- *     script.js сайту (Firebase Realtime Database, гілка views/РРРР-ММ-ДД).
- *
- * Вхід: у Telegram (міні-застосунок) — через initData, як у СіЯ;
- *       у браузері — через Roblox (OAuth 2.0 + PKCE) або Telegram Login Widget
- *       (потрібна оновлена функція: backend/serversideroles-dashboard.ts,
- *       налаштування — у dashboard/README.md).
- */
+
 (() => {
   "use strict";
 
@@ -24,13 +11,8 @@
     catalogApi: "https://siya-public-api.priluckijmikita.workers.dev/public/catalog",
     avatarApi: "https://api.uarpeh.xyz/api",
     botUsername: "siyadashbot",
-    // Roblox OAuth: Client ID застосунку з Creator Dashboard. Адреса панелі
-    // (https://dashboard.uarpeh.xyz/) має бути серед Redirect URLs.
     robloxClientId: "1724610019184754844",
     robloxAuthUrl: "https://apis.roblox.com/oauth/v1/authorize",
-    // Адреса повернення має точно збігатися з однією з Redirect URLs у Roblox.
-    // Порожньо — береться адреса цієї сторінки з index.html у кінці,
-    // напр. https://dashboard.uarpeh.xyz/index.html
     robloxRedirectUri: "",
     siteUrl: "https://uarpeh.xyz",
     timeZone: "Europe/Kyiv",
@@ -128,7 +110,6 @@
   }
   const isXp = (s) => s != null && /^\d+$/.test(String(s).replace(/[\s ]/g, ""));
 
-  // ───────────────────────── іконки ─────────────────────────
   const svg = (body, extra = "") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${body}</svg>`;
   const I = {
     overview: svg('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
@@ -146,7 +127,6 @@
     alert: svg('<path d="M12 8v5"/><path d="M12 16.5v.01"/><path d="M10.3 3.9 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>'),
     pause: svg('<circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/>'),
     info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8v.01"/>'),
-    // sun, moon — іконки Lucide (lucide.dev, ліцензія ISC)
     sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
     moon: svg('<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'),
     login: svg('<path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="M14 17l5-5-5-5M19 12H8"/>'),
@@ -155,10 +135,9 @@
     external: svg('<path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/>'),
   };
 
-  // ───────────────────────── довідники ─────────────────────────
   const FRACTIONS = ["Адміністрація", "Суд", "Прокуратура", "МВС", "Мерія", "СБС", "ДБР", "ДАРШ", "НПС", "Інше"];
   const COURT = ["Суд", "МВС", "Прокуратура"];
-  // Той самий вираз, що й у СіЯ (index.html → checkEditPermissions).
+  
   const HEAD_RE = /директор|начальник|голова|керівник|заступник|мер|суддя|міністр|прокурор|генерал/i;
   const ROBLOX_RE = /^[A-Za-z0-9_]{3,20}$/;
 
@@ -212,7 +191,7 @@
     { k: "expiry", l: "Дійсна до", ph: "01.12.2025", col: "Дійсна до" },
     F_CANS, F_TG, F_SUSP] };
 
-  // ───────────────────────── стан ─────────────────────────
+ 
   const S = {
     players: {}, licenses: {},
     regVia: "", regError: null, regLoaded: false,
@@ -233,10 +212,7 @@
   const KEY_AVA = "siya-dash-avatars-v1";
   const PAGE = 60;
 
-  // ───────────────────────── завантаження реєстрів ─────────────────────────
-  // players.js і licenses.js — це JS-літерали. Розбираємо їх як JSON (з
-  // прибиранням коментарів і висячих ком), без eval віддаленого коду —
-  // так само, як це робить registry-sync.mjs у воркері.
+
   function toJson(src, marker) {
     const m = src.match(marker);
     if (!m) throw new Error("не знайдено оголошення");
@@ -259,7 +235,7 @@
         let j = i + 1;
         while (j < body.length && /\s/.test(body[j])) j++;
         if (body[j] === "/" && (body[j + 1] === "/" || body[j + 1] === "*")) {
-          // кома перед коментарем: подивимось, що після коментаря
+
           let k = j;
           while (k < body.length) {
             if (body[k] === "/" && body[k + 1] === "/") { const n = body.indexOf("\n", k); k = n < 0 ? body.length : n; }
@@ -299,8 +275,7 @@
       return { players, licenses, via: "fetch" };
     } catch (err) {
       if (S.regVia === "script") throw err;
-      // Запасний шлях (наприклад, якщо сайт не віддає CORS): підключаємо файли
-      // як скрипти, як це робить СіЯ.
+
       console.warn("[панель] fetch реєстрів не вдався, підключаю як скрипти", err);
       const t = Date.now();
       await loadScript(CONFIG.playersUrl + "?t=" + t);
@@ -378,7 +353,6 @@
       S.user = (tg.initDataUnsafe && tg.initDataUnsafe.user) || null;
       return;
     }
-    // Повернення з Telegram Login Widget (режим data-auth-url): дані в query.
     const q = new URLSearchParams(location.search);
     if (q.get("hash") && q.get("id") && q.get("auth_date")) {
       const data = {};
@@ -399,10 +373,6 @@
       removeKey(KEY_LOGIN);
     }
   }
-  // ── Roblox OAuth 2.0 + PKCE ──
-  // Панель отримує code і передає його функції serversideroles (action
-  // "rbx_login"): та обмінює code на токен, читає профіль і повертає підписану
-  // сесію на 7 днів. Токени Roblox у браузері не зберігаються.
   function applySavedRoblox() {
     const r = readJSON(KEY_RBX);
     if (r && r.session && r.user && r.user.username && Number(r.exp) * 1000 > Date.now()) {
@@ -481,7 +451,7 @@
     toast("Ви вийшли. Панель працює в режимі перегляду.");
   }
 
-  // ───────────────────────── права (як у СіЯ) ─────────────────────────
+
   function fractionOrder() {
     const keys = Object.keys(S.players).filter((f) => Array.isArray(S.players[f]));
     return [...FRACTIONS.filter((f) => keys.includes(f)), ...keys.filter((f) => !FRACTIONS.includes(f))];
@@ -495,7 +465,7 @@
     if (!S.user) return null;
     const id = String(S.user.id || "");
     const un = String(S.user.username || "").toLowerCase();
-    // Roblox: шукаємо за ніком; Telegram: за полем telegram, як у СіЯ.
+
     const match = S.auth && S.auth.type === "roblox"
       ? (p) => !!(p && p.username && String(p.username).toLowerCase() === un)
       : (p) => {
@@ -525,13 +495,13 @@
       || (P.court && cat !== "mafia" && cat !== "ozu")
       || (P.isHead && ((cat === "weapon" && ["ДБР", "СБС"].includes(S.me.fraction)) || (cat === "police" && S.me.fraction === "НПС")))),
     deleteLic: (cat) => P.editLic(cat) && !(P.court && !P.isAdmin),
-    // фракції та категорії ліцензій додає й видаляє лише адміністрація
+
     manageGroups: () => P.isAdmin,
   };
   const addableFractions = () => fractionOrder().filter((f) => P.addPlayer(f));
   const editableCats = () => licOrder().filter((c) => P.editLic(c));
 
-  // ───────────────────────── похідні дані ─────────────────────────
+
   function licEntries(cat) {
     const g = S.licenses[cat];
     if (Array.isArray(g)) {
@@ -596,9 +566,7 @@
   const playerCount = () => fractionOrder().reduce((s, f) => s + (Array.isArray(S.players[f]) ? S.players[f].length : 0), 0);
   const licCount = () => licOrder().reduce((s, c) => s + licEntries(c).length, 0);
 
-  // ───────────────────────── аватари ─────────────────────────
-  // Спершу: кеш → каталог воркера → поле avatar з players.js. Решту (власники
-  // ліцензій) догружаємо ліниво через api.uarpeh.xyz, як головний сайт.
+
   let avCache = readJSON(KEY_AVA) || {};
   const AV_TTL = 6 * 86400 * 1000;
   let avDisabled = false, avFails = 0, avActive = 0;
@@ -691,7 +659,7 @@
       if (u) setAvatarInDom(el.getAttribute("data-ava"), u);
     });
   }
-  // Протерміновані посилання rbxcdn (30DAY-…) — прибираємо і догружаємо свіже.
+
   document.addEventListener("error", (e) => {
     const img = e.target;
     if (!(img instanceof HTMLImageElement)) return;
@@ -706,7 +674,7 @@
     else enqueueAvatar(k);
   }, true);
 
-  // ───────────────────────── дрібні елементи розмітки ─────────────────────────
+ 
   function statusChip(st) {
     const icon = st.kind === "ok" ? I.check : st.kind === "bad" ? I.cross : (st.label === "Відсторонено" ? I.pause : I.alert);
     return `<span class="status ${st.kind}">${icon}${esc(st.label)}</span>${st.note ? `<span class="status-note">${esc(st.note)}</span>` : ""}`;
@@ -724,7 +692,6 @@
     return `<div class="notice ${opts.error ? "error" : ""}">${opts.icon || I.info}<div>${html}</div>${opts.action || ""}</div>`;
   }
 
-  // ───────────────────────── каркас ─────────────────────────
   const ROUTES = [
     { id: "overview", label: "Огляд", icon: I.overview },
     { id: "roles", label: "Ролі", icon: I.roles },
@@ -737,8 +704,7 @@
     syncNav($("#nav"), "nav", counts);
     syncNav($("#tabbar"), "tabbar", null);
   }
-  // Пункти меню не перемальовуємо, а лише перемикаємо атрибути — тоді
-  // «пігулка» активного пункту і колір тексту змінюються плавно.
+
   function syncNav(box, key, counts) {
     box.setAttribute("data-slider", key);
     if ($$(":scope > a", box).length !== ROUTES.length) {
@@ -756,9 +722,7 @@
     });
   }
 
-  // ── плавні перемикачі ──
-  // Під активним пунктом кожного [data-slider] лежить «пігулка» .slider,
-  // яка переїжджає на новий пункт через CSS transition.
+
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const itemKey = (el) => el.getAttribute("data-k") ?? el.getAttribute("data-f") ?? el.getAttribute("data-c") ?? el.getAttribute("data-s") ?? el.getAttribute("data-r");
   const sliderItems = (box) => Array.from(box.children).filter((el) => !el.classList.contains("slider"));
@@ -827,7 +791,7 @@
     hydrateAvatars($("#mobile-account"));
   }
 
-  // ───────────────────────── маршрутизація ─────────────────────────
+
   function parseRoute() {
     const h = decodeURIComponent(location.hash.replace(/^#/, ""));
     const [r, arg] = h.split("/");
@@ -890,7 +854,6 @@
     if (!reduceMotion.matches) {
       const cls = !same ? "enter" : S.swap ? "swap" : "";
       if (cls) { v.classList.remove("enter", "swap"); void v.offsetWidth; v.classList.add(cls); }
-      // рядки таблиць зʼявляються по черзі згори донизу
       if (cls) revealRows(v, 0);
       else if (S.revealFrom != null) revealRows(v, S.revealFrom);
     }
@@ -902,8 +865,7 @@
   }
   let lastViewRoute = null;
 
-  // Поступова поява рядків. Затримка росте з номером рядка, але вся хвиля
-  // вкладається приблизно в 0,6 с, хоч би скільки було рядків.
+
   function revealRows(root, from) {
     const rows = $$(".reg tbody tr", root).slice(from);
     if (!rows.length) return;
@@ -922,7 +884,7 @@
     if (hs) hs.scrollLeft = hs.scrollWidth;
   }
 
-  // ───────────────────────── сторінка: огляд ─────────────────────────
+
   function guestNotice() {
     if (S.auth) {
       if (!S.me) {
@@ -1016,7 +978,7 @@
     return `<ul class="perm-list">${rows.join("")}</ul>`;
   }
 
-  // ───────────────────────── сторінка: ролі ─────────────────────────
+
   function rolesPage() {
     const order = fractionOrder();
     if (S.fraction !== "Усі" && !order.includes(S.fraction)) S.fraction = "Усі";
@@ -1072,7 +1034,7 @@
     </tr>`;
   }
 
-  // ───────────────────────── сторінка: ліцензії ─────────────────────────
+
   function licensesPage() {
     const cats = licOrder();
     if (!S.licCat || !cats.includes(S.licCat)) S.licCat = cats[0] || null;
@@ -1133,7 +1095,7 @@
     return `${guestNotice()}<div class="toolbar">${chips}</div>${toolbar}<div class="card"><div class="card-head"><h2>${esc(meta.title)}</h2><p>${fmt(rows.length)} ${plural(rows.length, ["запис", "записи", "записів"])}${isList ? ", порядок як на сайті" : ", за абеткою"}</p>${P.manageGroups() ? `<div class="right"><button type="button" class="btn btn-sm btn-quiet-danger" data-act="delete-category" data-c="${esc(cat)}">${I.trash}Видалити категорію</button></div>` : ""}</div>${table}</div>`;
   }
 
-  // ───────────────────────── сторінка: перегляди ─────────────────────────
+ 
   let seriesCache = null;
   function series() {
     if (!S.views) return [];
@@ -1200,7 +1162,7 @@
     return `<div class="table-scroll" style="margin-top:16px"><table class="data-table"><thead><tr><th>Дата</th><th class="r">Перегляди</th><th class="r">Середнє за 7 днів</th></tr></thead><tbody>${rows.map((p) => `<tr><td>${esc(dayTitle(p.k))}${p.partial ? " (триває)" : ""}</td><td class="r">${fmt(p.v)}</td><td class="r">${p.avg == null ? "—" : fmt(p.avg)}</td></tr>`).join("")}</tbody></table></div>`;
   }
 
-  // ───────────────────────── графіки ─────────────────────────
+
   function niceScale(max, ticks = 4) {
     if (max <= 0) return { max: 4, step: 1 };
     const raw = max / ticks;
@@ -1427,7 +1389,7 @@
       <div class="heat-legend"><span>Переглядів за день:</span>${ranges.map(([l, i]) => `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:8px"><i style="background:var(--heat-${i})"></i>${l}</span>`).join("")}</div>`;
   }
 
-  // ───────────────────────── підказка ─────────────────────────
+
   const tipEl = $("#tip");
   function showTip(html, x, y) {
     tipEl.innerHTML = html;
@@ -1465,7 +1427,7 @@
     hideTip();
   });
 
-  // ───────────────────────── тости ─────────────────────────
+
   function toast(msg, error = false) {
     const t = document.createElement("div");
     t.className = "toast" + (error ? " error" : "");
@@ -1475,7 +1437,7 @@
     setTimeout(() => t.remove(), error ? 6400 : 3900);
   }
 
-  // ───────────────────────── діалоги ─────────────────────────
+
   const dlg = $("#dlg");
   function openDialog(html, onSubmit) {
     dlg.innerHTML = html;
@@ -1516,7 +1478,7 @@
     return `<div class="field"><label for="f-${name}">${esc(label)}${opts.required ? " *" : ""}</label><input id="f-${name}" name="${name}" value="${esc(value || "")}" placeholder="${esc(ph || "")}" autocomplete="off" ${opts.required ? "required" : ""} ${opts.maxlength ? `maxlength="${opts.maxlength}"` : ""}>${opts.hint ? `<span class="hint">${esc(opts.hint)}</span>` : ""}</div>`;
   }
 
-  // ── гравець ──
+
   function playerForm(mode, fraction, nick = "", presetNick = "") {
     const p = mode === "edit" ? (S.players[fraction] || []).find((x) => x && String(x.username).toLowerCase() === nick.toLowerCase()) || {} : {};
     const fractions = mode === "add" ? addableFractions() : [fraction];
@@ -1558,7 +1520,7 @@
     });
   }
 
-  // ── ліцензія ──
+  
   function licForm(mode, cat, nick = "", presetNick = "") {
     const cats = mode === "add" ? editableCats() : [cat];
     if (!cats.length) return toast("У вас немає прав на ліцензії.", true);
@@ -1600,7 +1562,7 @@
     });
   }
 
-  // ── фракції та категорії ──
+
   function addFractionDialog() {
     openDialog(`<form method="dialog" novalidate>
       <h2>Нова фракція</h2>
@@ -1713,14 +1675,14 @@
     hydrateAvatars(dlg);
   }
 
-  // ───────────────────────── профіль гравця ─────────────────────────
+
   const drawer = $("#drawer"), veil = $("#drawer-veil");
   function openPerson(nick) {
     S.drawerNick = nick;
     renderDrawer();
     drawer.classList.add("open"); veil.classList.add("open");
     drawer.setAttribute("aria-hidden", "false");
-    // фокус після поточної події клавіатури, інакше Enter «натисне» кнопку закриття
+
     setTimeout(() => { const close = $('[data-act="close-drawer"]', drawer); if (close) close.focus(); }, 0);
   }
   function closePerson() {
@@ -1764,7 +1726,6 @@
   }
   veil.addEventListener("click", closePerson);
 
-  // ───────────────────────── пошук ─────────────────────────
   const gq = $("#global-q"), gr = $("#global-results");
   let gActive = -1, gItems = [];
   function searchPeople(q) {
@@ -1805,7 +1766,6 @@
   });
   document.addEventListener("pointerdown", (e) => { if (!e.target.closest("#global-search")) gr.hidden = true; });
 
-  // ───────────────────────── редагування ─────────────────────────
   async function callEdit(payload) {
     if (!S.auth) throw new Error("Увійдіть, щоб редагувати.");
     const body = { ...payload };
@@ -1857,8 +1817,7 @@
   const cleanEmpty = (o) => { for (const k of Object.keys(o)) if (o[k] === "" || o[k] === null) delete o[k]; return o; };
   const swap = (arr, a, b) => { if (a < 0 || b < 0 || a >= arr.length || b >= arr.length) return; [arr[a], arr[b]] = [arr[b], arr[a]]; };
 
-  // Локальне застосування — дзеркало логіки serversideroles, щоб не чекати
-  // перезбирання сайту (~1 хв).
+ 
   function applyPlayers(action, fraction, username, data) {
     if (!S.players[fraction]) S.players[fraction] = [];
     const arr = S.players[fraction];
@@ -1911,7 +1870,7 @@
     }
   }
 
-  // ───────────────────────── тема ─────────────────────────
+
   function effectiveTheme() {
     const t = document.documentElement.getAttribute("data-theme");
     if (t) return t;
@@ -1931,7 +1890,6 @@
     render();
   }
 
-  // ───────────────────────── події ─────────────────────────
   document.addEventListener("click", (e) => {
     const link = e.target.closest("a[href]");
     const tg = window.Telegram && window.Telegram.WebApp;
@@ -2029,7 +1987,6 @@
     if (manual) toast(S.regError ? "Реєстр не оновився: " + S.regError : "Дані оновлено", !!S.regError);
   }
 
-  // ───────────────────────── старт ─────────────────────────
   function start() {
     applyTheme();
     initAuth();
