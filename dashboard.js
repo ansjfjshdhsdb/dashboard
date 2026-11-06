@@ -17,6 +17,8 @@
     siteUrl: "https://uarpeh.xyz",
     timeZone: "Europe/Kyiv",
     loginMaxAgeDays: 7,
+    // true: панель відкривається лише тим, чий акаунт є у фракціях; false: достатньо просто увійти
+    requireMembership: true,
   };
 
   // ───────────────────────── утиліти ─────────────────────────
@@ -201,7 +203,7 @@
     route: "overview", fraction: "Усі", licCat: null,
     rolesQ: "", licQ: "", licStatus: "all",
     range: 30, showTable: false,
-    pages: {}, busy: false,
+    pages: {}, busy: false, signingIn: false,
     drawerNick: null,
     people: new Map(),
   };
@@ -290,12 +292,14 @@
   async function refreshRegistries() {
     try {
       const r = await loadRegistries();
+      if (!S.auth) return;
       S.players = structuredClone(r.players);
       S.licenses = structuredClone(r.licenses);
       S.regVia = r.via;
       S.regError = null;
       S.regLoaded = true;
     } catch (err) {
+      if (!S.auth) return;
       S.regError = err.message || String(err);
     }
     rebuild();
@@ -313,8 +317,8 @@
     return out;
   }
   async function refreshViews() {
-    try { S.views = await loadViews(); S.viewsError = null; }
-    catch (err) { S.viewsError = err.message || String(err); }
+    try { const v = await loadViews(); if (!S.auth) return; S.views = v; S.viewsError = null; }
+    catch (err) { if (!S.auth) return; S.viewsError = err.message || String(err); }
     seriesCache = null;
   }
   async function pollToday() {
@@ -337,6 +341,7 @@
       const r = await fetch(CONFIG.catalogApi, { credentials: "omit" });
       if (!r.ok) return;
       const j = await r.json();
+      if (!S.auth) return;
       if (j && j.avatars && typeof j.avatars === "object") {
         S.catalog = j.avatars;
         refreshAvatarsInDom();
@@ -433,8 +438,7 @@
       writeJSON(KEY_RBX, { session: j.session, exp: j.exp, user: j.user });
       removeKey(KEY_LOGIN);
       applySavedRoblox();
-      rebuild();
-      toast(S.me ? `Ви увійшли як ${S.me.username}` : `Ви увійшли як ${j.user.username}, але цього ніка немає у фракціях`);
+      toast(`Ви увійшли як ${j.user.username}`);
       return true;
     } catch (err) {
       toast(err.message || "Вхід через Roblox не вдався.", true);
@@ -443,12 +447,29 @@
   }
   const apiHeaders = () => ({ "Content-Type": "application/json", Authorization: "Bearer " + CONFIG.supabaseKey, apikey: CONFIG.supabaseKey });
 
+  // Прибирає з памʼяті й зі сторінки все, що прийшло з реєстрів.
+  function dropData() {
+    S.players = {}; S.licenses = {}; S.people = new Map(); S.catalog = {};
+    S.views = null; S.viewsError = null; seriesCache = null;
+    S.pages = {}; S.rolesQ = ""; S.licQ = ""; S.drawerNick = null;
+    lastViewRoute = null;
+    closeDialog(); closePerson();
+    $("#view").replaceChildren();
+    $("#global-q").value = ""; $("#global-results").hidden = true;
+  }
+  function wipeData() {
+    dropData();
+    S.me = null; S.regLoaded = false; S.regError = null; S.regVia = "";
+    avCache = {}; avQueue.length = 0; avQueued.clear(); removeKey(KEY_AVA);
+  }
+
   function logout() {
     removeKey(KEY_RBX);
     removeKey(KEY_LOGIN);
     S.auth = null; S.user = null;
-    rebuild(); render();
-    toast("Ви вийшли. Панель працює в режимі перегляду.");
+    wipeData();
+    render();
+    toast("Ви вийшли з панелі.");
   }
 
 
@@ -806,7 +827,71 @@
 
   const TITLES = { overview: "Огляд", roles: "Ролі", licenses: "Ліцензії", views: "Перегляди сайту" };
 
+  // ───────────────────────── екран входу ─────────────────────────
+  const canView = () => !!S.auth && (!CONFIG.requireMembership || !!S.me);
+
+  function gateState() {
+    if (S.signingIn) return "signing";
+    if (!S.auth) return "login";
+    if (!S.regLoaded) {
+      if (!CONFIG.requireMembership) return "ok";
+      return S.regError ? "error" : "checking";
+    }
+    if (CONFIG.requireMembership && !S.me) return "denied";
+    return "ok";
+  }
+
+  function gateHtml(gs, a) {
+    const isWebapp = !!(S.auth && S.auth.type === "webapp");
+    const mark = `<span class="brand-mark"><img class="logo-light" src="img/logo-black.png" alt="СіЯ" width="305" height="154"><img class="logo-dark" src="img/logo-white.png" alt="СіЯ" width="305" height="153"></span>`;
+    const logoutBtn = S.auth && !isWebapp ? `<button type="button" class="btn" data-act="logout">${I.logout}Вийти</button>` : "";
+    let body;
+    if (gs === "login") {
+      body = `<h1>Вхід у панель</h1>
+        <p class="gate-sub">${CONFIG.requireMembership ? "Панель доступна лише учасникам фракцій. Увійдіть, щоб продовжити." : "Увійдіть, щоб відкрити панель."}</p>
+        <button type="button" class="btn btn-primary btn-block" data-act="login-roblox">Увійти через Roblox</button>
+        <div class="or"><span>або</span></div>
+        <div class="tg-widget" id="tg-widget"><span class="spinner"></span></div>
+        <p class="legal">Входячи, ви погоджуєтеся з <a href="terms.html" target="_blank">умовами користування</a> та <a href="privacy.html" target="_blank">політикою конфіденційності</a>.</p>`;
+    } else if (gs === "signing") {
+      body = `<h1>Вхід у панель</h1><div class="gate-status"><span class="spinner"></span>Входимо через Roblox…</div>`;
+    } else if (gs === "checking") {
+      body = `<h1>Перевіряємо доступ</h1><div class="gate-status"><span class="spinner"></span>Завантажуємо реєстр…</div>${logoutBtn ? `<div class="gate-actions">${logoutBtn}</div>` : ""}`;
+    } else if (gs === "error") {
+      body = `<h1>Не вдалося перевірити доступ</h1>${notice(`Реєстр не завантажився: ${esc(S.regError)}. Перевірте зʼєднання й спробуйте ще раз.`, { error: true, icon: I.alert })}<div class="gate-actions"><button type="button" class="btn btn-primary" data-act="retry-load">Спробувати ще раз</button>${logoutBtn}</div>`;
+    } else {
+      const who = a ? a.loginName : "";
+      const what = a && a.via === "Roblox" ? "ваш нік Roblox" : "ваш Telegram";
+      body = `<h1>Немає доступу</h1><p class="gate-sub">Акаунт <strong>${esc(who)}</strong> не знайдено у фракціях. Панель відкривається лише учасникам фракцій. Попросіть адміністрацію додати ${what} до реєстру або увійдіть іншим акаунтом.</p><div class="gate-actions"><button type="button" class="btn btn-primary" data-act="retry-load">Перевірити ще раз</button>${logoutBtn}</div>`;
+    }
+    const dark = effectiveTheme() === "dark";
+    return `<div class="gate-tools">${iconBtn("theme", themeIcon(), dark ? "Світла тема" : "Темна тема")}</div><div class="gate-card">${mark}${body}</div>`;
+  }
+
+  let gateKey = "";
+  function showGate(gs) {
+    document.body.classList.add("gated");
+    document.title = "Вхід — СіЯ Панель";
+    if (gs === "denied") dropData();
+    const a = S.auth ? accountInfo() : null;
+    const box = $("#gate");
+    const key = [gs, effectiveTheme(), a ? a.loginName : "", S.regError || ""].join("|");
+    if (key === gateKey && box.firstChild) return;
+    gateKey = key;
+    box.innerHTML = gateHtml(gs, a);
+    if (gs === "login") mountTelegramWidget($("#tg-widget", box));
+  }
+  function hideGate() {
+    if (!document.body.classList.contains("gated")) return;
+    document.body.classList.remove("gated");
+    $("#gate").replaceChildren();
+    gateKey = "";
+  }
+
   function render() {
+    const gs = gateState();
+    if (gs !== "ok") { hideTip(); showGate(gs); return; }
+    hideGate();
     hideTip();
     renderNav();
     renderAccount();
@@ -1650,7 +1735,10 @@
       <div class="dlg-actions"><button type="button" class="btn" data-act="close-dlg">Закрити</button></div>
     </div>`;
     openDialog(html, null);
-    const box = $("#tg-widget", dlg);
+    mountTelegramWidget($("#tg-widget", dlg));
+  }
+
+  function mountTelegramWidget(box) {
     const s = document.createElement("script");
     s.async = true;
     s.src = "https://telegram.org/js/telegram-widget.js?22";
@@ -1793,7 +1881,7 @@
       removeKey(KEY_LOGIN);
       removeKey(KEY_RBX);
       S.auth = null; S.user = null;
-      setTimeout(() => { rebuild(); render(); }, 0);
+      setTimeout(() => { wipeData(); render(); toast(msg, true); }, 0);
     }
     throw new Error(msg);
   }
@@ -1907,6 +1995,7 @@
     switch (act) {
       case "refresh": return refreshAll(true);
       case "login": return loginDialog();
+      case "retry-load": S.regLoaded = false; S.regError = null; return loadData();
       case "login-roblox": el.disabled = true; return startRobloxLogin();
       case "logout": closeDialog(); return logout();
       case "account": return accountDialog();
@@ -1962,7 +2051,7 @@
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && S.drawerNick && !dlg.open) closePerson();
-    if (e.key === "/" && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName) && !dlg.open) { e.preventDefault(); gq.focus(); }
+    if (e.key === "/" && gateState() === "ok" && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName) && !dlg.open) { e.preventDefault(); gq.focus(); }
   });
 
   addEventListener("hashchange", () => { parseRoute(); render(); window.scrollTo(0, 0); });
@@ -1987,15 +2076,34 @@
     if (manual) toast(S.regError ? "Реєстр не оновився: " + S.regError : "Дані оновлено", !!S.regError);
   }
 
+  let dataLoading = false;
+  // Усі запити до реєстрів, лічильника й каталогу починаються тут і лише після входу.
+  async function loadData() {
+    if (!S.auth || dataLoading) return;
+    dataLoading = true;
+    S.regError = null;
+    render();
+    try { await refreshRegistries(); } finally { dataLoading = false; }
+    if (!S.auth) return;
+    parseRoute(); S.swap = true; render();
+    if (canView()) loadExtras();
+  }
+  function loadExtras() {
+    refreshViews().then(() => { if (canView() && (S.route === "views" || S.route === "overview")) render(); });
+    loadCatalog();
+  }
+
   function start() {
     applyTheme();
     initAuth();
     parseRoute();
+    const q = new URLSearchParams(location.search);
+    S.signingIn = q.has("state") && (q.has("code") || q.has("error"));
     render();
-    finishRobloxLogin().then((ok) => { if (ok) render(); });
-    refreshRegistries().then(() => { parseRoute(); S.swap = true; render(); });
-    refreshViews().then(() => { if (S.route === "views" || S.route === "overview") render(); });
-    loadCatalog();
+    finishRobloxLogin().catch(() => false).then(() => {
+      S.signingIn = false;
+      if (S.auth) loadData(); else render();
+    });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => placeSliders(document, true));
     setInterval(pollToday, 60_000);
     document.addEventListener("visibilitychange", () => { if (!document.hidden) pollToday(); });

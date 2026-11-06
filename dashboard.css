@@ -646,3 +646,20 @@ dialog.dlg[open] { animation: dlg-in 0.18s var(--ease); }
 @keyframes row-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes view-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes view-swap { from { opacity: 0.35; } to { opacity: 1; } }
+
+/* ---------- екран входу ---------- */
+.gate { display: none; position: relative; min-height: 100vh; min-height: 100dvh; align-items: center; justify-content: center; padding: 24px 16px calc(24px + env(safe-area-inset-bottom)); }
+body.gated .app { display: none; }
+body.gated .gate { display: flex; }
+.gate-tools { position: absolute; top: calc(12px + env(safe-area-inset-top)); right: 12px; }
+.gate-card { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 32px 28px 26px; text-align: center; }
+.gate-card .brand-mark { display: flex; justify-content: center; margin-bottom: 22px; }
+.gate-card .brand-mark img { height: 34px; }
+.gate-card h1 { margin: 0 0 6px; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+.gate-sub { margin: 0 0 22px; color: var(--ink-2); font-size: 14px; }
+.gate-sub strong { color: var(--ink); overflow-wrap: anywhere; }
+.gate-status { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px 0 6px; color: var(--ink-2); }
+.gate-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+.gate-actions .btn { width: 100%; height: 44px; }
+.gate-card .notice { margin: 14px 0 0; text-align: left; }
+@media (max-width: 480px) { .gate-card { padding: 28px 20px 22px; } }

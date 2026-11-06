@@ -21,10 +21,10 @@ form-action 'self';">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap">
-<link rel="stylesheet" href="dashboard.css?v=7">
+<link rel="stylesheet" href="dashboard.css?v=8">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-<body>
+<body class="gated">
 <div class="app">
   <aside class="side" aria-label="Навігація">
     <a class="brand" href="#overview"><span class="brand-mark"><img class="logo-light" src="img/logo-black.png" alt="СіЯ" width="305" height="154"><img class="logo-dark" src="img/logo-white.png" alt="СіЯ" width="305" height="153"></span><span class="brand-sub">Дашбоард</span></a>
@@ -58,12 +58,14 @@ form-action 'self';">
   <nav class="tabbar" id="tabbar" aria-label="Розділи"></nav>
 </div>
 
+<div class="gate" id="gate"><noscript>Для роботи панелі потрібен JavaScript.</noscript></div>
+
 <dialog class="dlg" id="dlg"></dialog>
 <div class="drawer-veil" id="drawer-veil"></div>
 <aside class="drawer" id="drawer" aria-hidden="true" aria-label="Профіль гравця"></aside>
 <div class="tip" id="tip" role="tooltip"></div>
 <div class="toasts" id="toasts" aria-live="assertive"></div>
 
-<script src="dashboard.js?v=8"></script>
+<script src="dashboard.js?v=9"></script>
 </body>
 </html>
